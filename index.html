@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fall 2026 Course Schedule</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#171717">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Schedule">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --ink:#171717; --ink-2:#6B6B6B; --ink-3:#A3A3A3; --line:#E3E3E3;
+    --lang-rgb:41,98,143; --ccds-rgb:189,122,33; --math-rgb:42,122,97;
+    --mathcase-rgb:92,150,128; --china-rgb:168,72,56; --cs-rgb:124,73,156;
+    --aero-rgb:70,90,150;
+    --tint-a:0.10; --tint-b:0.55;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#121212; --ink:#F2F2F2; --ink-2:#9B9B9B; --ink-3:#6E6E6E; --line:#2A2A2A;
+      --tint-a:0.22; --tint-b:0.8; }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:28px 18px 60px; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; line-height:1.5;
+  }
+  .wrap{max-width:600px; margin:0 auto;}
+  .kicker{font-size:11.5px; color:var(--ink-3); font-family:'IBM Plex Mono', monospace;}
+  h1{font-size:20px; font-weight:500; margin:3px 0 3px; line-height:1.3;}
+  .sub{font-size:13px; color:var(--ink-2); margin:0 0 20px;}
+
+  .hero{padding-bottom:16px; margin-bottom:20px; border-bottom:1px solid var(--line);}
+  .hero-row{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3); margin-bottom:8px;}
+  .hero-main .eyebrow{font-size:11.5px; color:var(--ink-3);}
+  .hero-course{font-size:16px; font-weight:500; margin-top:3px;}
+  .hero-meta{font-size:13px; color:var(--ink-2); margin-top:3px;}
+  .hero-time{font-family:'IBM Plex Mono', monospace; font-weight:500; color:var(--ink);}
+  .hero-empty{font-size:14px; color:var(--ink-2); margin-top:6px;}
+
+  .settings{margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--line);}
+  .settings summary{cursor:pointer; color:var(--ink-3); font-size:12.5px;}
+  .settings .body{margin-top:12px; display:flex; flex-direction:column; gap:9px;}
+  .settings label{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-2);}
+  .settings input[type=date]{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; border:none;
+    border-bottom:1px solid var(--line); background:transparent; color:var(--ink); padding:2px 0;
+  }
+  .note{font-size:12px; color:var(--ink-3); line-height:1.6;}
+
+  .tabs{display:flex; gap:22px; margin-bottom:10px;}
+  .tab{font-size:13px; color:var(--ink-3); cursor:pointer; padding-bottom:6px; border-bottom:1.5px solid transparent; user-select:none;}
+  .tab.active{color:var(--ink); border-bottom-color:var(--ink);}
+  .tab-caption{font-size:11.5px; color:var(--ink-3); margin:0 0 16px; line-height:1.5;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:6px 14px; margin-bottom:20px;}
+  .legend-item{display:flex; align-items:center; gap:5px; font-size:11px; color:var(--ink-2);}
+  .legend-dot{width:8px; height:8px; border-radius:2px;}
+
+  .day{margin-bottom:24px;}
+  .day h3{font-size:12.5px; font-weight:500; color:var(--ink-2); margin:0 0 8px; padding-bottom:7px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;}
+  .day h3 .d{font-family:'IBM Plex Mono', monospace; font-weight:400; color:var(--ink-3);}
+  .session{padding:10px 12px; margin-bottom:8px; border-radius:7px;}
+  .session-head{display:flex; gap:14px; align-items:baseline;}
+  .session-head .time{flex:0 0 auto; font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-2); min-width:88px;}
+  .session-head .name{font-size:14px; font-weight:500; color:var(--ink); flex:1;}
+  .orig{font-size:11px; color:var(--ink-3); margin:2px 0 0 102px;}
+  .meta{font-size:12.5px; color:var(--ink-2); margin:4px 0 0 102px; line-height:1.6;}
+  .meta.empty{font-style:italic; margin-left:0; padding:4px 0;}
+
+  .week-nav, .month-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:20px;}
+  .nav-btn{cursor:pointer; color:var(--ink-2); font-size:17px; padding:2px 10px; user-select:none;}
+  .week-label, .month-label{font-size:13.5px; font-weight:500; text-align:center; flex:1;}
+  .week-range{display:block; font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-3); font-weight:400; margin-top:2px;}
+  select.week-select{
+    font-family:'IBM Plex Sans', sans-serif; font-size:12.5px; border:none; border-bottom:1px solid var(--line);
+    background:transparent; color:var(--ink-2); padding:3px 0; display:block; margin:0 auto 18px;
+  }
+
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:18px;}
+  .cal-dow{font-size:10.5px; color:var(--ink-3); text-align:center; padding-bottom:8px;}
+  .cal-cell{
+    aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border-radius:50%; font-size:13px; color:var(--ink-2); cursor:pointer; position:relative;
+  }
+  .cal-cell.empty{visibility:hidden; cursor:default;}
+  .cal-cell.has-class{color:var(--ink); font-weight:500;}
+  .cal-cell.holiday{color:var(--ink-3); font-weight:400;}
+  .cal-cell.adjusted::after{content:''; position:absolute; top:1px; right:5px; width:4px; height:4px; border-radius:50%; border:1px solid var(--ink-2);}
+  .cal-cell.selected.adjusted::after{border-color:var(--bg);}
+  .cal-cell .dot{width:3px; height:3px; border-radius:50%; background:var(--ink-2); margin-top:3px;}
+  .cal-cell.today{box-shadow:inset 0 0 0 1px var(--ink-2);}
+  .cal-cell.selected{background:var(--ink); color:var(--bg);}
+  .cal-cell.selected .dot{background:var(--bg);}
+  .cal-key{font-size:11px; color:var(--ink-3); margin:-8px 0 18px; line-height:1.6;}
+
+  .day-detail{padding-top:16px; border-top:1px solid var(--line);}
+  .day-detail-head{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-2); margin-bottom:10px;}
+
+  .elective{margin-top:28px; padding-top:18px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2);}
+  .elective .t{font-weight:500; color:var(--ink); margin-bottom:4px; font-size:14px;}
+
+  footer{margin-top:26px; padding-top:16px; border-top:1px solid var(--line);}
+
+  .c-lang{background:rgba(var(--lang-rgb),var(--tint-a)); border-left:3px solid rgba(var(--lang-rgb),var(--tint-b));}
+  .c-ccds{background:rgba(var(--ccds-rgb),var(--tint-a)); border-left:3px solid rgba(var(--ccds-rgb),var(--tint-b));}
+  .c-math{background:rgba(var(--math-rgb),var(--tint-a)); border-left:3px solid rgba(var(--math-rgb),var(--tint-b));}
+  .c-mathcase{background:rgba(var(--mathcase-rgb),var(--tint-a)); border-left:3px solid rgba(var(--mathcase-rgb),var(--tint-b));}
+  .c-china{background:rgba(var(--china-rgb),var(--tint-a)); border-left:3px solid rgba(var(--china-rgb),var(--tint-b));}
+  .c-cs{background:rgba(var(--cs-rgb),var(--tint-a)); border-left:3px solid rgba(var(--cs-rgb),var(--tint-b));}
+  .c-aero{background:rgba(var(--aero-rgb),var(--tint-a)); border-left:3px solid rgba(var(--aero-rgb),var(--tint-b));}
+  .legend-dot.c-lang{background:rgb(var(--lang-rgb));}
+  .legend-dot.c-ccds{background:rgb(var(--ccds-rgb));}
+  .legend-dot.c-math{background:rgb(var(--math-rgb));}
+  .legend-dot.c-mathcase{background:rgb(var(--mathcase-rgb));}
+  .legend-dot.c-china{background:rgb(var(--china-rgb));}
+  .legend-dot.c-cs{background:rgb(var(--cs-rgb));}
+  .legend-dot.c-aero{background:rgb(var(--aero-rgb));}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">2026 Fall Semester · Artificial Intelligence (Hangzhou Campus)</div>
+  <h1>Course Schedule</h1>
+  <p class="sub">Weeks 1–17</p>
+
+  <div class="hero" id="hero"></div>
+
+  <details class="settings">
+    <summary>Semester start date &amp; holidays</summary>
+    <div class="body">
+      <label>Monday of Week 1:
+        <input type="date" id="startDate" value="2026-09-07">
+      </label>
+      <div class="note">Confirmed against the official 2026–2027 Academic Calendar (学年校历): Week 1 runs 7–13 September 2026. Change the date here if needed — weeks and the calendar tab recalculate automatically.</div>
+      <div class="note">30 September – 7 October 2026: National Day holiday (plus the shifted Mid-Autumn Festival break) — no classes. Already applied to the calendar below.</div>
+      <div class="note">16, 17 and 25 October are marked in a different colour on the official calendar (likely make-up teaching days) — the calendar image doesn't specify what runs on them, so check with your department. They're marked with a small ring below.</div>
+    </div>
+  </details>
+
+  <div class="tabs">
+    <span class="tab active" data-tab="days">Days</span>
+    <span class="tab" data-tab="week">Weeks</span>
+    <span class="tab" data-tab="month">Calendar</span>
+  </div>
+  <p class="tab-caption" id="tabCaption"></p>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot c-lang"></span>Chinese</div>
+    <div class="legend-item"><span class="legend-dot c-ccds"></span>Contemporary China</div>
+    <div class="legend-item"><span class="legend-dot c-math"></span>Advanced Math</div>
+    <div class="legend-item"><span class="legend-dot c-mathcase"></span>Math — case lectures</div>
+    <div class="legend-item"><span class="legend-dot c-china"></span>Intro to China</div>
+    <div class="legend-item"><span class="legend-dot c-cs"></span>C Programming</div>
+    <div class="legend-item"><span class="legend-dot c-aero"></span>Aerospace Intro B</div>
+  </div>
+
+  <div id="view-days"></div>
+  <div id="view-week" style="display:none;"></div>
+  <div id="view-month" style="display:none;"></div>
+
+  <div class="elective">
+    <div class="t">General Education (Liberal Arts) Course (1)</div>
+    <div>素质教育（博雅课程）(1) · Weeks 2–9 · Theory · Instructor Han Zhai · Cohort 262535</div>
+    <div style="margin-top:4px;">Day and period not yet assigned — check separately. (If you're not in cohort 262535, this course may not apply to you either — worth confirming.)</div>
+  </div>
+
+  <footer>
+    <div class="note">Compiled from the official timetable photo and the 2026–2027 Academic Calendar (校历). Codes before room numbers (R1–R3, C3, C4) refer to buildings on the campus map: R = Research buildings in the Research Area, C = Teaching buildings in the Central Zone.</div>
+  </footer>
+
+</div>
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WEEKDAYS_LONG = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+const PERIOD_TIME = {
+  1:['08:00','08:45'],2:['08:50','09:35'],3:['09:50','10:35'],4:['10:40','11:25'],
+  5:['11:30','12:15'],6:['14:00','14:45'],7:['14:50','15:35'],8:['15:50','16:35'],
+  9:['16:40','17:25'],10:['17:30','18:15'],11:['19:00','19:45'],12:['19:50','20:35'],
+  13:['20:40','21:25'],14:['21:30','22:15']
+};
+function periodsToTime(spec){
+  const [a,b] = spec.split('-').map(Number);
+  return [PERIOD_TIME[a][0], PERIOD_TIME[b][1]];
+}
+
+const COURSES = {
+  lang:    {name:'Chinese (1)', orig:'汉语（1）· Group 005', c:'lang'},
+  ccds:    {name:"Contemporary China's Development and Social Practice", orig:'当代中国发展与社会实践', c:'ccds'},
+  math:    {name:'Advanced Mathematics for Engineering (1)', orig:'工科高等数学（1）', c:'math'},
+  mathcase:{name:'Selected Lectures on Higher Mathematics Case in Engineering (1)', orig:'工科高等数学案例选讲（1）', c:'mathcase'},
+  china:   {name:'Introduction to China', orig:'中国概况', c:'china'},
+  cs:      {name:'C Programming Language', orig:'C语言程序设计', c:'cs'},
+  aero:    {name:'Introduction to Aeronautics and Astronautics B', orig:'航空航天概论B', c:'aero'}
+};
+
+const DOW = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DOW_SHORT = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+const MEETINGS = [
+  {day:0, course:'math', periods:'11-13', variants:[
+    {weeks:'2-7', parity:'all', teacher:'Naifu Peng', room:'R2 · Research Building No.2, Room 1056'},
+    {weeks:'8-12', parity:'all', teacher:'Sayed Ali', room:'R2 · Research Building No.2, Room 1056'},
+    {weeks:'13-17', parity:'all', teacher:'Jeremy', room:'R1 · Research Building No.1, Room 1001'}
+  ]},
+  {day:1, course:'aero', periods:'6-7', variants:[
+    {weeks:'2-13', parity:'all', teacher:'Yankui Wang, Ming kai Wang', room:'C3 · Teaching Building No.1, Room 2004'}
+  ]},
+  {day:1, course:'lang', periods:'3-4', variants:[
+    {weeks:'2-17', parity:'all', teacher:'Ningjing Bao', room:'C4 · Teaching Building No.2, Room 2003'}
+  ]},
+  {day:2, course:'ccds', periods:'11-12', variants:[
+    {weeks:'2-5', parity:'all', teacher:'Li Su', room:'R1 · Research Building No.1, Room 1040', tag:'lecture'}
+  ]},
+  {day:2, course:'ccds', periods:'6-9', variants:[
+    {weeks:'10-12', parity:'even', teacher:'Li Su', room:'TBD — practice session', tag:'practice'}
+  ]},
+  {day:2, course:'ccds', periods:'11-14', variants:[
+    {weeks:'14,16', parity:'all', teacher:'Li Su', room:'TBD — practice session', tag:'final practice'}
+  ]},
+  {day:3, course:'ccds', periods:'1-2', variants:[
+    {weeks:'6-9', parity:'all', teacher:'Wenjie Xu', room:'R1 · Research Building No.1, Room 1040', tag:'lecture'}
+  ]},
+  {day:3, course:'math', periods:'3-5', variants:[
+    {weeks:'2-7', parity:'all', teacher:'Naifu Peng', room:'R2 · Research Building No.2, Room 1056'},
+    {weeks:'8-12', parity:'all', teacher:'Sayed Ali', room:'R2 · Research Building No.2, Room 1056'},
+    {weeks:'13-17', parity:'all', teacher:'Jeremy', room:'R1 · Research Building No.1, Room 1001'}
+  ]},
+  {day:3, course:'lang', periods:'8-9', variants:[
+    {weeks:'2-17', parity:'all', teacher:'Ningjing Bao', room:'C4 · Teaching Building No.2, Room 2003'}
+  ]},
+  {day:3, course:'cs', periods:'11-13', variants:[
+    {weeks:'8-14', parity:'even', teacher:'Tao Yu', room:'R1 · Research Building No.1, Room 1040', tag:'lab'},
+    {weeks:'16', parity:'all', teacher:'Tao Yu', room:'R1 · Research Building No.1, Room 1040', tag:'lab (extended)', periodsOverride:'11-14'}
+  ]},
+  {day:4, course:'china', periods:'1-2', variants:[
+    {weeks:'2-3', parity:'all', teacher:'Jingnong Weng', room:'R3 · Research Building No.3, Room 1032'},
+    {weeks:'4-7,10-17', parity:'all', teacher:'Mantong Zhao', room:'R3 · Research Building No.3, Room 1032'},
+    {weeks:'8-9', parity:'all', teacher:'Hong Fang', room:'R3 · Research Building No.3, Room 1032'}
+  ]},
+  {day:4, course:'mathcase', periods:'3-5', variants:[
+    {weeks:'2-17', parity:'all', teacher:'Zhouteng Ye', room:'R1 · Research Building No.1, Room 4108'}
+  ]},
+  {day:4, course:'cs', periods:'8-10', variants:[
+    {weeks:'5-14', parity:'all', teacher:'Tao Yu', room:'R1 · Research Building No.1, Room 1040', tag:'lecture'},
+    {weeks:'15', parity:'all', teacher:'Tao Yu', room:'R1 · Research Building No.1, Room 1040', tag:'lecture (shorter)', periodsOverride:'8-9'}
+  ]}
+];
+
+const HOLIDAYS = [
+  {from:'2026-09-30', to:'2026-10-07', label:'National Day holiday + shifted Mid-Autumn Festival break'}
+];
+const ADJUSTED_DAYS = {
+  '2026-10-16':'marked in a different colour on the official calendar — likely a make-up day for 5 October',
+  '2026-10-17':'marked in a different colour on the official calendar — possibly a teaching day',
+  '2026-10-25':'marked in a different colour on the official calendar — possibly a teaching day'
+};
+function dateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getHoliday(date){
+  const key = dateKey(date);
+  for(const h of HOLIDAYS){ if(key>=h.from && key<=h.to) return h; }
+  return null;
+}
+function getAdjustedNote(date){ return ADJUSTED_DAYS[dateKey(date)] || null; }
+
+function parseWeeks(spec, parity){
+  const parts = spec.split(',').map(s=>s.trim());
+  return function(w){
+    for(const p of parts){
+      let inRange;
+      if(p.includes('-')){ const [a,b]=p.split('-').map(Number); inRange = w>=a && w<=b; }
+      else { inRange = w===Number(p); }
+      if(inRange){
+        if(parity==='even') return w%2===0;
+        if(parity==='odd') return w%2===1;
+        return true;
+      }
+    }
+    return false;
+  };
+}
+function formatWeeks(spec, parity){
+  let s = 'Weeks ' + spec.replace(/-/g,'–').replace(/,/g,', ');
+  if(parity==='even') s += ' (even)';
+  if(parity==='odd') s += ' (odd)';
+  return s;
+}
+
+function explainNoClass(dayIdx, weekNum){
+  if(dayIdx>4) return 'Weekend — no classes are scheduled.';
+  if(weekNum<1) return 'The semester has not started yet.';
+  if(weekNum>17) return 'Main teaching weeks have finished.';
+  const dayMeetings = MEETINGS.filter(m=>m.day===dayIdx);
+  if(!dayMeetings.length) return 'No classes are ever scheduled on this day.';
+  const byCourse = {};
+  dayMeetings.forEach(m=>{
+    if(!byCourse[m.course]) byCourse[m.course] = [];
+    m.variants.forEach(v=> byCourse[m.course].push(formatWeeks(v.weeks, v.parity)));
+  });
+  const parts = Object.keys(byCourse).map(k=>`${COURSES[k].name} only meets ${byCourse[k].join(', ')}`);
+  return 'No classes this week — ' + parts.join('; ') + '.';
+}
+
+function getStart(){
+  const v = document.getElementById('startDate').value;
+  const [y,m,d] = v.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function addDays(date, n){ const r = new Date(date); r.setDate(r.getDate()+n); return r; }
+function stripTime(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function weekNumberForDate(date){
+  const start = getStart();
+  const diffDays = Math.round((stripTime(date) - stripTime(start)) / 86400000);
+  return Math.floor(diffDays/7) + 1;
+}
+function mondayOfWeek(weekNum){ return addDays(getStart(), (weekNum-1)*7); }
+function fmtDate(d){ return d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3); }
+function fmtDateLong(d){ return d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear(); }
+
+function resolveMeetingsForDate(date){
+  const weekNum = weekNumberForDate(date);
+  const dow = date.getDay();
+  const dayIdx = dow===0 ? 6 : dow-1;
+  const holiday = getHoliday(date);
+  const adjusted = getAdjustedNote(date);
+  if(holiday) return {weekNum, dayIdx, items:[], holiday, adjusted};
+  if(dayIdx>4 || weekNum<1 || weekNum>17) return {weekNum, dayIdx, items:[], adjusted};
+  const items = [];
+  MEETINGS.filter(m=>m.day===dayIdx).forEach(m=>{
+    m.variants.forEach(v=>{
+      const test = parseWeeks(v.weeks, v.parity);
+      if(test(weekNum)){
+        const periods = v.periodsOverride || m.periods;
+        const [start,end] = periodsToTime(periods);
+        items.push({course:m.course, periods, start, end, teacher:v.teacher, room:v.room, tag:v.tag});
+      }
+    });
+  });
+  items.sort((a,b)=> a.start.localeCompare(b.start));
+  return {weekNum, dayIdx, items, adjusted};
+}
+
+function resolvedItemHtml(it){
+  const c = COURSES[it.course];
+  const tagNote = it.tag ? `, ${it.tag}` : '';
+  return `<div class="session c-${c.c}">
+    <div class="session-head"><span class="time">${it.start}–${it.end}</span><span class="name">${c.name}</span></div>
+    <div class="meta">${it.room} — ${it.teacher}${tagNote}</div>
+  </div>`;
+}
+
+function renderHero(){
+  const now = new Date();
+  const todayRes = resolveMeetingsForDate(now);
+  const hh = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  let ongoing = null, next = null;
+  if(todayRes.dayIdx<=4){
+    for(const it of todayRes.items){
+      if(hh>=it.start && hh<=it.end){ ongoing = it; break; }
+    }
+    if(!ongoing) next = todayRes.items.find(it=>it.start>hh);
+  }
+  let searchDate = new Date(now);
+  let daysAhead = 0;
+  while(!ongoing && !next && daysAhead<14){
+    daysAhead++;
+    searchDate = addDays(now, daysAhead);
+    const res = resolveMeetingsForDate(searchDate);
+    if(res.dayIdx<=4 && res.items.length){ next = res.items[0]; next._date = searchDate; }
+  }
+  const wk = todayRes.weekNum;
+  const wkLabel = wk<1 ? 'semester not started yet' : (wk>17 ? 'main teaching weeks finished' : `week ${wk} of 17`);
+  let html = `<div class="hero-row"><span>Today, ${fmtDateLong(now)}</span><span>${wkLabel}</span></div>`;
+  if(ongoing){
+    const c = COURSES[ongoing.course];
+    html += `<div class="hero-main"><span class="eyebrow">Happening now</span><div class="hero-course">${c.name}</div>
+    <div class="hero-meta"><span class="hero-time">${ongoing.start}–${ongoing.end}</span> · ${ongoing.room} · ${ongoing.teacher}</div></div>`;
+  } else if(next){
+    const c = COURSES[next.course];
+    const when = next._date ? (' · ' + fmtDate(next._date)) : '';
+    html += `<div class="hero-main"><span class="eyebrow">Up next</span><div class="hero-course">${c.name}</div>
+    <div class="hero-meta"><span class="hero-time">${next.start}–${next.end}</span>${when} · ${next.room} · ${next.teacher}</div></div>`;
+  } else {
+    html += `<div class="hero-empty">No classes coming up.</div>`;
+  }
+  document.getElementById('hero').innerHTML = html;
+}
+
+function renderDaysView(){
+  let html = '';
+  for(let d=0; d<7; d++){
+    html += `<div class="day"><h3>${DOW[d]}</h3>`;
+    if(d>4){
+      html += `<div class="meta empty">Weekend — no classes are scheduled.</div>`;
+    } else {
+      const meetings = MEETINGS.filter(m=>m.day===d).sort((a,b)=>{
+        const [as] = periodsToTime(a.periods); const [bs] = periodsToTime(b.periods);
+        return as.localeCompare(bs);
+      });
+      if(!meetings.length){ html += `<div class="meta empty">No classes are scheduled on this day.</div>`; }
+      meetings.forEach(m=>{
+        const c = COURSES[m.course];
+        const [start,end] = periodsToTime(m.periods);
+        html += `<div class="session c-${c.c}">
+          <div class="session-head"><span class="time">${start}–${end}</span><span class="name">${c.name}</span></div>
+          <div class="orig">${c.orig}</div>`;
+        m.variants.forEach(v=>{
+          const periods = v.periodsOverride || m.periods;
+          const timeNote = v.periodsOverride ? `, ${periodsToTime(periods).join('–')}` : '';
+          const tagNote = v.tag ? `, ${v.tag}` : '';
+          html += `<div class="meta">${formatWeeks(v.weeks, v.parity)} — ${v.teacher}, ${v.room}${timeNote}${tagNote}</div>`;
+        });
+        html += `</div>`;
+      });
+    }
+    html += `</div>`;
+  }
+  document.getElementById('view-days').innerHTML = html;
+}
+
+let currentWeek = null;
+function renderWeekView(){
+  if(currentWeek===null){ currentWeek = Math.min(Math.max(weekNumberForDate(new Date()),1),17); }
+  const monday = mondayOfWeek(currentWeek);
+  const sunday = addDays(monday,6);
+  let opts = '';
+  for(let w=1; w<=17; w++){ opts += `<option value="${w}" ${w===currentWeek?'selected':''}>Week ${w}</option>`; }
+  let html = `<div class="week-nav">
+    <span class="nav-btn" id="weekPrev">‹</span>
+    <div class="week-label">Week ${currentWeek} of 17<span class="week-range">${fmtDate(monday)} – ${fmtDate(sunday)}</span></div>
+    <span class="nav-btn" id="weekNext">›</span>
+  </div>
+  <select class="week-select" id="weekJump">${opts}</select>`;
+  for(let d=0; d<5; d++){
+    const date = addDays(monday, d);
+    const res = resolveMeetingsForDate(date);
+    html += `<div class="day"><h3>${DOW[d]}<span class="d">${fmtDate(date)}</span></h3>`;
+    if(res.holiday){ html += `<div class="meta empty">Holiday — no classes (${res.holiday.label})</div>`; }
+    else{
+      if(!res.items.length){ html += `<div class="meta empty">${explainNoClass(res.dayIdx, res.weekNum)}</div>`; }
+      res.items.forEach(it=>{ html += resolvedItemHtml(it); });
+      if(res.adjusted){ html += `<div class="meta" style="margin-top:6px;">⚑ ${res.adjusted}</div>`; }
+    }
+    html += `</div>`;
+  }
+  document.getElementById('view-week').innerHTML = html;
+  document.getElementById('weekPrev').onclick = ()=>{ if(currentWeek>1){ currentWeek--; renderWeekView(); } };
+  document.getElementById('weekNext').onclick = ()=>{ if(currentWeek<17){ currentWeek++; renderWeekView(); } };
+  document.getElementById('weekJump').onchange = (e)=>{ currentWeek = Number(e.target.value); renderWeekView(); };
+}
+
+let calYear, calMonth, selectedDate;
+function renderMonthView(){
+  const now = new Date();
+  if(calYear===undefined){ calYear = now.getFullYear(); calMonth = now.getMonth(); selectedDate = stripTime(now); }
+  const first = new Date(calYear, calMonth, 1);
+  const firstDow = (first.getDay()+6)%7;
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const monthName = MONTHS[calMonth]+' '+calYear;
+  let html = `<div class="month-nav">
+    <span class="nav-btn" id="monthPrev">‹</span>
+    <div class="month-label">${monthName}</div>
+    <span class="nav-btn" id="monthNext">›</span>
+  </div>
+  <div class="cal-grid">${DOW_SHORT.map(d=>`<div class="cal-dow">${d}</div>`).join('')}`;
+  for(let i=0;i<firstDow;i++){ html += `<div class="cal-cell empty"></div>`; }
+  for(let day=1; day<=daysInMonth; day++){
+    const date = new Date(calYear, calMonth, day);
+    const res = resolveMeetingsForDate(date);
+    const isToday = stripTime(date).getTime()===stripTime(now).getTime();
+    const isSelected = stripTime(date).getTime()===selectedDate.getTime();
+    const cls = ['cal-cell'];
+    if(res.items.length) cls.push('has-class');
+    if(res.holiday) cls.push('holiday');
+    if(res.adjusted) cls.push('adjusted');
+    if(isToday) cls.push('today');
+    if(isSelected) cls.push('selected');
+    html += `<div class="${cls.join(' ')}" data-date="${calYear}-${calMonth}-${day}">${day}${res.items.length?'<span class="dot"></span>':''}</div>`;
+  }
+  html += `</div><div class="cal-key">● class day &nbsp; ○ calendar note (see above) &nbsp; faint = holiday</div>`;
+  html += `<div class="day-detail" id="dayDetail"></div>`;
+  document.getElementById('view-month').innerHTML = html;
+  document.getElementById('monthPrev').onclick = ()=>{ calMonth--; if(calMonth<0){calMonth=11; calYear--;} renderMonthView(); };
+  document.getElementById('monthNext').onclick = ()=>{ calMonth++; if(calMonth>11){calMonth=0; calYear++;} renderMonthView(); };
+  document.querySelectorAll('.cal-cell[data-date]').forEach(cell=>{
+    cell.onclick = ()=>{
+      const [y,m,d] = cell.dataset.date.split('-').map(Number);
+      selectedDate = new Date(y,m,d);
+      renderMonthView();
+    };
+  });
+  renderDayDetail();
+}
+function renderDayDetail(){
+  const res = resolveMeetingsForDate(selectedDate);
+  let html = `<div class="day-detail-head">${WEEKDAYS_LONG[selectedDate.getDay()]}, ${fmtDateLong(selectedDate)}</div>`;
+  if(res.holiday){ html += `<div class="meta empty">Public holiday — no classes (${res.holiday.label})</div>`; }
+  else if(!res.items.length){ html += `<div class="meta empty">${explainNoClass(res.dayIdx, res.weekNum)}</div>`; }
+  else { res.items.forEach(it=>{ html += resolvedItemHtml(it); }); }
+  if(res.adjusted){ html += `<div class="meta" style="margin-top:8px;">⚑ ${res.adjusted}</div>`; }
+  document.getElementById('dayDetail').innerHTML = html;
+}
+
+function renderAll(){
+  renderHero();
+  renderDaysView();
+  currentWeek = null;
+  renderWeekView();
+  calYear = undefined;
+  renderMonthView();
+}
+
+const TAB_CAPTIONS = {
+  days: 'The recurring weekly pattern. Where a class rotates teacher or room across the term, every variant is listed with its own week range.',
+  week: 'Pick any week (1–17) to see exact dates with the specific teacher and room resolved for that week.',
+  month: 'Tap any date to see what runs that day. Colour blocks match the legend above.'
+};
+function setTabCaption(tab){ document.getElementById('tabCaption').textContent = TAB_CAPTIONS[tab]; }
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    ['days','week','month'].forEach(v=>{
+      document.getElementById('view-'+v).style.display = (v===tab.dataset.tab) ? 'block' : 'none';
+    });
+    setTabCaption(tab.dataset.tab);
+  };
+});
+document.getElementById('startDate').onchange = renderAll;
+
+setTabCaption('days');
+renderAll();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
